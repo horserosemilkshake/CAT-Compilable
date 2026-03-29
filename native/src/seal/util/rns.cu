@@ -1715,12 +1715,16 @@ namespace seal
                                                                                 base_q_->base()[i].const_ratio().data()[1],
                                                                                 temp);
                 uint64_t half_mod = barrett_reduce_64(half, base_q_->base()[i]);
-                eltwiseSubModScalarKernel<<<(coeff_count_ + 255) / 256, 256>>>(temp, 
-                                                                                temp,
-                                                                                half_mod,
-                                                                                base_q_->base()[i].value(), 
-                                                                                coeff_count_                                                                                
-                                                                                );
+                // eltwiseSubModScalarKernel<<<(coeff_count_ + 255) / 256, 256>>>(temp, 
+                //                                                                 temp,
+                //                                                                 half_mod,
+                //                                                                 base_q_->base()[i].value(), 
+                //                                                                 coeff_count_                                                                                
+                //                                                                 );
+
+                for (std::size_t index = 0; index < coeff_count_; ++index) { 
+                    temp[index] = temp[index] > half_mod ? temp[index] - half_mod : temp[index] + base_q_->base()[i].value() - half_mod; 
+                }
 
                 eltwiseSubModKernel<<<(coeff_count_ + 255) / 256, 256>>>(input + i * coeff_count_, 
                                                                         input + i * coeff_count_, 
